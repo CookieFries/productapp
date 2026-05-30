@@ -17,6 +17,8 @@
         .btn-success:hover { background:#45a817; }
         .btn-danger { background:#ff4d4f; color:white; }
         .btn-danger:hover { background:#e04042; }
+        .btn-purple { background:#722ed1; color:white; }
+        .btn-purple:hover { background:#5b21b6; }
         .btn-outline { background:white; color:#4A90E2; border:1px solid #4A90E2; }
         .btn-outline:hover { background:#f0f7ff; }
         .btn-sm { padding:5px 10px; font-size:12px; }
@@ -31,7 +33,6 @@
         .form-input:focus, .form-textarea:focus { border-color:#4A90E2; outline:none; box-shadow:0 0 0 2px rgba(74,144,226,0.1); }
         .form-textarea { min-height:80px; resize:vertical; }
         .form-row { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-        .form-row-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
         .card { border:1px solid #eee; border-radius:8px; padding:12px; margin-bottom:10px; transition:box-shadow 0.2s; }
         .card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
@@ -50,9 +51,6 @@
         .modal-footer { padding:15px 20px; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px; }
         .translate-btn { background:#722ed1; color:white; border:none; padding:6px 12px; border-radius:4px; font-size:12px; cursor:pointer; margin-top:5px; }
         .translate-btn:hover { background:#5b21b6; }
-        .lang-tabs { display:flex; gap:5px; margin-bottom:10px; }
-        .lang-tab { padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; background:#f0f0f0; }
-        .lang-tab.active { background:#4A90E2; color:white; }
         .toast { position:fixed; top:20px; right:20px; background:#52c41a; color:white; padding:10px 20px; border-radius:6px; z-index:2000; display:none; }
         .empty { text-align:center; padding:30px; color:#999; }
         .tabs { display:flex; border-bottom:2px solid #eee; margin-bottom:20px; }
@@ -60,7 +58,14 @@
         .tab.active { color:#4A90E2; border-bottom-color:#4A90E2; font-weight:bold; }
         #loginPanel { max-width:400px; margin:100px auto; }
         #adminPanel { display:none; }
-        .img-preview { max-width:100px; max-height:60px; object-fit:cover; border-radius:4px; margin-top:5px; }
+        .github-status { display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:4px 10px; border-radius:12px; }
+        .status-ok { background:#f6ffed; color:#52c41a; }
+        .status-err { background:#fff2f0; color:#ff4d4f; }
+        .status-warn { background:#fffbe6; color:#faad14; }
+        .save-indicator { display:none; align-items:center; gap:5px; }
+        .save-indicator.active { display:inline-flex; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .spin { animation:spin 1s linear infinite; }
     </style>
 </head>
 <body>
@@ -84,8 +89,12 @@
         <div class="header">
             <h1>商品管理后台</h1>
             <div class="header-btns">
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="exportData()">导出数据</button>
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="importData()">导入数据</button>
+                <span id="githubStatus" class="github-status status-warn">未配置GitHub</span>
+                <span id="saveIndicator" class="save-indicator"><span class="spin">⟳</span> 保存中...</span>
+                <button class="btn btn-success" onclick="saveToGitHub()" id="btnSaveGitHub">保存到GitHub</button>
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="exportData()">导出JSON</button>
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="importData()">导入JSON</button>
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="openSettings()">设置</button>
                 <button class="btn btn-outline" style="color:white;border-color:white" onclick="doLogout()">退出</button>
             </div>
         </div>
@@ -105,13 +114,44 @@
                 <div class="panel">
                     <div class="panel-header">
                         <span class="panel-title">AI翻译</span>
-                        <button class="btn btn-primary" onclick="translateAll()">一键翻译所有</button>
+                        <button class="btn btn-purple" onclick="translateAll()">一键翻译所有</button>
                     </div>
                     <div class="panel-body">
                         <p style="color:#666;margin-bottom:15px">将中文内容自动翻译为英语、法语、阿拉伯语。使用Google Translate免费API。</p>
                         <div id="translateStatus"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-width:500px">
+            <div class="modal-header">
+                <span class="modal-title">设置</span>
+                <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">GitHub Personal Access Token</label>
+                    <input type="password" class="form-input" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+                    <p style="font-size:12px;color:#999;margin-top:5px">需要repo权限。在 <a href="https://github.com/settings/tokens" target="_blank">GitHub设置</a> 中生成。</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">仓库地址</label>
+                    <input type="text" class="form-input" id="repoUrl" placeholder="CookieFries/productapp">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">数据文件路径</label>
+                    <input type="text" class="form-input" id="dataPath" placeholder="app/src/main/assets/data.json">
+                </div>
+                <button class="btn btn-primary" onclick="testGitHubConnection()">测试连接</button>
+                <div id="testResult" style="margin-top:10px;font-size:13px"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('settingsModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
             </div>
         </div>
     </div>
@@ -228,10 +268,12 @@
                 <div class="form-group" style="margin-top:15px">
                     <label class="form-label">视频URL</label>
                     <input type="text" class="form-input" id="prodVideo" placeholder="https://...">
+                    <p style="font-size:12px;color:#999;margin-top:3px">上传视频到YouTube/B站等平台，粘贴链接</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">图片URL（每行一个，最多5张）</label>
                     <textarea class="form-textarea" id="prodImages" placeholder="https://image1.jpg&#10;https://image2.jpg"></textarea>
+                    <p style="font-size:12px;color:#999;margin-top:3px">上传图片到 <a href="https://imgur.com" target="_blank">imgur</a> 等图床，粘贴链接</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">中文描述</label>
@@ -272,6 +314,13 @@
         const DEFAULT_PWD = 'admin123';
         const DATA_URL = 'https://cookiefries.github.io/productapp/data.json';
 
+        // GitHub Config
+        let githubConfig = {
+            token: localStorage.getItem('gh_token') || '',
+            repo: localStorage.getItem('gh_repo') || 'CookieFries/productapp',
+            dataPath: localStorage.getItem('gh_data_path') || 'app/src/main/assets/data.json'
+        };
+
         function showToast(msg, color) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -280,11 +329,23 @@
             setTimeout(() => t.style.display = 'none', 2500);
         }
 
+        function updateGitHubStatus() {
+            const el = document.getElementById('githubStatus');
+            if (!githubConfig.token) {
+                el.className = 'github-status status-warn';
+                el.textContent = '未配置GitHub';
+            } else {
+                el.className = 'github-status status-ok';
+                el.textContent = 'GitHub已连接';
+            }
+        }
+
         function doLogin() {
             const pwd = document.getElementById('loginPwd').value;
             if (pwd === DEFAULT_PWD) {
                 document.getElementById('loginPanel').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
+                updateGitHubStatus();
                 loadData();
             } else {
                 showToast('密码错误', '#ff4d4f');
@@ -361,6 +422,109 @@
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+        // Settings
+        function openSettings() {
+            document.getElementById('githubToken').value = githubConfig.token;
+            document.getElementById('repoUrl').value = githubConfig.repo;
+            document.getElementById('dataPath').value = githubConfig.dataPath;
+            openModal('settingsModal');
+        }
+
+        function saveSettings() {
+            githubConfig.token = document.getElementById('githubToken').value.trim();
+            githubConfig.repo = document.getElementById('repoUrl').value.trim();
+            githubConfig.dataPath = document.getElementById('dataPath').value.trim();
+            localStorage.setItem('gh_token', githubConfig.token);
+            localStorage.setItem('gh_repo', githubConfig.repo);
+            localStorage.setItem('gh_data_path', githubConfig.dataPath);
+            updateGitHubStatus();
+            closeModal('settingsModal');
+            showToast('设置已保存');
+        }
+
+        async function testGitHubConnection() {
+            const result = document.getElementById('testResult');
+            if (!githubConfig.token) {
+                result.innerHTML = '<span style="color:#ff4d4f">请先填写Token</span>';
+                return;
+            }
+            result.innerHTML = '<span style="color:#999">测试中...</span>';
+            try {
+                const resp = await fetch('https://api.github.com/repos/' + githubConfig.repo, {
+                    headers: { 'Authorization': 'Bearer ' + githubConfig.token }
+                });
+                if (resp.ok) {
+                    result.innerHTML = '<span style="color:#52c41a">连接成功！仓库可访问。</span>';
+                } else {
+                    result.innerHTML = '<span style="color:#ff4d4f">连接失败：' + resp.status + '，请检查Token和仓库地址</span>';
+                }
+            } catch(e) {
+                result.innerHTML = '<span style="color:#ff4d4f">网络错误：' + e.message + '</span>';
+            }
+        }
+
+        // GitHub API
+        async function getFileSHA(path) {
+            const resp = await fetch('https://api.github.com/repos/' + githubConfig.repo + '/contents/' + path, {
+                headers: { 'Authorization': 'Bearer ' + githubConfig.token }
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                return data.sha;
+            }
+            return null;
+        }
+
+        async function saveToGitHub() {
+            if (!githubConfig.token) {
+                showToast('请先在设置中配置GitHub Token', '#ff4d4f');
+                openSettings();
+                return;
+            }
+
+            const indicator = document.getElementById('saveIndicator');
+            const btn = document.getElementById('btnSaveGitHub');
+            indicator.classList.add('active');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+
+            try {
+                const content = JSON.stringify(appData, null, 2);
+                const encoded = btoa(unescape(encodeURIComponent(content)));
+                const sha = await getFileSHA(githubConfig.dataPath);
+
+                const body = {
+                    message: '更新商品数据 - ' + new Date().toLocaleString('zh-CN'),
+                    content: encoded,
+                    branch: 'main'
+                };
+                if (sha) body.sha = sha;
+
+                const resp = await fetch('https://api.github.com/repos/' + githubConfig.repo + '/contents/' + githubConfig.dataPath, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + githubConfig.token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (resp.ok) {
+                    showToast('数据已保存到GitHub！');
+                    localStorage.setItem('productapp_data', content);
+                } else {
+                    const err = await resp.json();
+                    showToast('保存失败：' + (err.message || resp.status), '#ff4d4f');
+                }
+            } catch(e) {
+                showToast('保存失败：' + e.message, '#ff4d4f');
+            }
+
+            indicator.classList.remove('active');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+
         // Category CRUD
         function addCategory() {
             editCatIdx = -1;
@@ -403,14 +567,14 @@
             }
             closeModal('catModal');
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         function deleteCategory(idx) {
             if (!confirm('确定删除此分类及所有子分类和商品？')) return;
             appData.categories.splice(idx, 1);
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         // Subcategory CRUD
@@ -457,14 +621,14 @@
             }
             closeModal('subModal');
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         function deleteSubcategory(catIdx, subIdx) {
             if (!confirm('确定删除此子分类及所有商品？')) return;
             appData.categories[catIdx].subcategories.splice(subIdx, 1);
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         // Product CRUD
@@ -535,14 +699,14 @@
             }
             closeModal('prodModal');
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         function deleteProduct(catIdx, subIdx, prodIdx) {
             if (!confirm('确定删除此商品？')) return;
             appData.categories[catIdx].subcategories[subIdx].products.splice(prodIdx, 1);
             renderAll();
-            saveData();
+            saveDataLocal();
         }
 
         // AI Translation
@@ -556,7 +720,6 @@
         async function translateFields(srcIds, targetIds) {
             const srcText = document.getElementById(srcIds[0]).value.trim();
             if (!srcText) { showToast('请先填写中文内容', '#ff4d4f'); return; }
-            const langMap = { En: 'en', Fr: 'fr', Ar: 'ar' };
             for (const tid of targetIds) {
                 const lang = tid.slice(-2).toLowerCase();
                 try {
@@ -612,16 +775,15 @@
                 }
             }
             status.innerHTML = '<p style="color:#52c41a">翻译完成！共翻译 ' + count + ' 项</p>';
-            saveData();
+            saveDataLocal();
             renderAll();
         }
 
-        // Save & Export
-        function saveData() {
+        // Local Save
+        function saveDataLocal() {
             try {
                 localStorage.setItem('productapp_data', JSON.stringify(appData));
-                showToast('数据已保存到本地');
-            } catch(e) { showToast('保存失败', '#ff4d4f'); }
+            } catch(e) {}
         }
 
         function exportData() {
@@ -645,7 +807,7 @@
                 try {
                     appData = JSON.parse(e.target.result);
                     renderAll();
-                    saveData();
+                    saveDataLocal();
                     showToast('数据导入成功');
                 } catch(err) {
                     showToast('文件格式错误', '#ff4d4f');
