@@ -1,0 +1,189 @@
+{
+  "settings": {
+    "appName": {
+      "zh": "商品展示",
+      "en": "Product Display",
+      "fr": "Exposition de produits",
+      "ar": "عرض المنتجات"
+    },
+    "primaryColor": "#4A90E2"
+  },
+  "ui": {
+    "zh": {
+      "refresh": "刷新数据",
+      "loading": "加载中...",
+      "noData": "暂无商品",
+      "noImage": "暂无图片",
+      "back": "返回",
+      "settings": "设置",
+      "language": "语言",
+      "darkMode": "黑夜模式",
+      "admin": "后台管理",
+      "imageLoadFail": "图片加载失败",
+      "videoLoadFail": "视频加载失败"
+    },
+    "en": {
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "noData": "No products",
+      "noImage": "No image",
+      "back": "Back",
+      "settings": "Settings",
+      "language": "Language",
+      "darkMode": "Dark Mode",
+      "admin": "Admin Panel",
+      "imageLoadFail": "Image load failed",
+      "videoLoadFail": "Video load failed"
+    },
+    "fr": {
+      "refresh": "Actualiser",
+      "loading": "Chargement...",
+      "noData": "Aucun produit",
+      "noImage": "Pas d'image",
+      "back": "Retour",
+      "settings": "Paramètres",
+      "language": "Langue",
+      "darkMode": "Mode Sombre",
+      "admin": "Panneau d'administration",
+      "imageLoadFail": "Échec du chargement",
+      "videoLoadFail": "Échec de la vidéo"
+    },
+    "ar": {
+      "refresh": "تحديث",
+      "loading": "جار التحميل...",
+      "noData": "لا توجد منتجات",
+      "noImage": "لا توجد صورة",
+      "back": "رجوع",
+      "settings": "الإعدادات",
+      "language": "اللغة",
+      "darkMode": "الوضع الداكن",
+      "admin": "لوحة الإدارة",
+      "imageLoadFail": "فشل تحميل الصورة",
+      "videoLoadFail": "فشل تحميل الفيديو"
+    }
+  },
+  "categories": [
+    {
+      "id": "3c_digital",
+      "name": { "zh": "3C数码", "en": "3C Digital", "fr": "3C Numérique", "ar": "3C رقمي" },
+      "subcategories": [
+        {
+          "id": "phone_parts",
+          "name": { "zh": "手机零配件", "en": "Phone Parts", "fr": "Pièces de téléphone", "ar": "قطع غيار الهاتف" },
+          "products": [
+            {
+              "id": "demo_phone_case",
+              "name": { "zh": "示例手机壳", "en": "Sample Phone Case", "fr": "Coque téléphone", "ar": "حافظة هاتف" },
+              "video": "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+              "images": [
+                "https://via.placeholder.com/400x300/4A90E2/ffffff?text=Phone+Case+1",
+                "https://via.placeholder.com/400x300/5BA0F2/ffffff?text=Phone+Case+2",
+                "https://via.placeholder.com/400x300/6BB0FF/ffffff?text=Phone+Case+3"
+              ],
+              "description": {
+                "zh": "高品质TPU手机壳，防摔抗震，完美贴合，多色可选。",
+                "en": "High quality TPU phone case, shockproof, perfect fit, multiple colors available.",
+                "fr": "Coque téléphone TPU haute qualité, anti-choc, ajustement parfait, plusieurs couleurs.",
+                "ar": "حافظة هاتف عالية الجودة من TPU، مقاومة للصدمات، ملاءمة مثالية، ألوان متعددة."
+              }
+            }
+          ]
+        },
+        {
+          "id": "power_bank",
+          "name": { "zh": "移动电源", "en": "Power Bank", "fr": "Batterie externe", "ar": "بنك الطاقة" },
+          "products": [
+            {
+              "id": "demo_power_bank",
+              "name": { "zh": "示例充电宝", "en": "Sample Power Bank", "fr": "Batterie portable", "ar": "شاحن محمول" },
+              "video": "",
+              "images": [
+                "https://via.placeholder.com/400x300/FF6B6B/ffffff?text=Power+Bank+1",
+                "https://via.placeholder.com/400x300/FF8B8B/ffffff?text=Power+Bank+2"
+              ],
+              "description": {
+                "zh": "10000mAh大容量移动电源，支持快充，轻薄便携。",
+                "en": "10000mAh large capacity power bank, fast charging supported, slim and portable.",
+                "fr": "Batterie externe 10000mAh, charge rapide, mince et portable.",
+                "ar": "بنك طاقة بسعة 10000 مللي أمبير، يدعم الشحن السريع، رشيق ومحمول."
+              }
+            }
+          ]
+        },
+        {
+          "id": "smart_wearable",
+          "name": { "zh": "智能穿戴", "en": "Smart Wearable", "fr": "Objet connecté", "ar": "أجهزة قابلة للارتداء" },
+          "products": []
+        },
+        {
+          "id": "bluetooth_speaker",
+          "name": { "zh": "蓝牙音响", "en": "Bluetooth Speaker", "fr": "Haut-parleur Bluetooth", "ar": "مكبر صوت بلوتوث" },
+          "products": []
+        }
+      ]
+    },
+    {
+      "id": "lighting",
+      "name": { "zh": "灯饰", "en": "Lighting", "fr": "Éclairage", "ar": "إضاءة" },
+      "subcategories": [
+        {
+          "id": "ceiling_light",
+          "name": { "zh": "吸顶灯", "en": "Ceiling Light", "fr": "Plafonnier", "ar": "سقفية" },
+          "products": []
+        },
+        {
+          "id": "desk_lamp",
+          "name": { "zh": "台灯", "en": "Desk Lamp", "fr": "Lampe de bureau", "ar": "مصباح مكتبي" },
+          "products": []
+        },
+        {
+          "id": "strip_light",
+          "name": { "zh": "灯带", "en": "LED Strip", "fr": "Bande LED", "ar": "شريط LED" },
+          "products": []
+        }
+      ]
+    },
+    {
+      "id": "small_appliance",
+      "name": { "zh": "小家电", "en": "Small Appliance", "fr": "Petit électroménager", "ar": "أجهزة منزلية صغيرة" },
+      "subcategories": [
+        {
+          "id": "kitchen_appliance",
+          "name": { "zh": "厨房电器", "en": "Kitchen Appliance", "fr": "Appareil de cuisine", "ar": "أجهزة المطبخ" },
+          "products": []
+        },
+        {
+          "id": "cleaning_appliance",
+          "name": { "zh": "清洁电器", "en": "Cleaning Appliance", "fr": "Appareil de nettoyage", "ar": "أجهزة التنظيف" },
+          "products": []
+        },
+        {
+          "id": "personal_care",
+          "name": { "zh": "个人护理", "en": "Personal Care", "fr": "Soins personnels", "ar": "العناية الشخصية" },
+          "products": []
+        }
+      ]
+    },
+    {
+      "id": "beauty_daily",
+      "name": { "zh": "美妆日护", "en": "Beauty & Care", "fr": "Beauté & Soins", "ar": "الجمال والعناية" },
+      "subcategories": [
+        {
+          "id": "skincare",
+          "name": { "zh": "护肤品", "en": "Skincare", "fr": "Soins de la peau", "ar": "العناية بالبشرة" },
+          "products": []
+        },
+        {
+          "id": "makeup",
+          "name": { "zh": "彩妆", "en": "Makeup", "fr": "Maquillage", "ar": "مكياج" },
+          "products": []
+        },
+        {
+          "id": "daily_care",
+          "name": { "zh": "日用品", "en": "Daily Care", "fr": "Soins quotidiens", "ar": "العناية اليومية" },
+          "products": []
+        }
+      ]
+    }
+  ]
+}

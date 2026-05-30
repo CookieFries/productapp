@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理后台</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#f0f2f5; color:#333; }
+        .header { background:#4A90E2; color:white; padding:15px 20px; display:flex; align-items:center; justify-content:space-between; }
+        .header h1 { font-size:20px; }
+        .header-btns { display:flex; gap:10px; }
+        .btn { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:13px; transition:all 0.2s; }
+        .btn-primary { background:#4A90E2; color:white; }
+        .btn-primary:hover { background:#3a80d2; }
+        .btn-success { background:#52c41a; color:white; }
+        .btn-success:hover { background:#45a817; }
+        .btn-danger { background:#ff4d4f; color:white; }
+        .btn-danger:hover { background:#e04042; }
+        .btn-outline { background:white; color:#4A90E2; border:1px solid #4A90E2; }
+        .btn-outline:hover { background:#f0f7ff; }
+        .btn-sm { padding:5px 10px; font-size:12px; }
+        .container { max-width:1200px; margin:20px auto; padding:0 20px; }
+        .panel { background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:20px; overflow:hidden; }
+        .panel-header { padding:15px 20px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; }
+        .panel-title { font-size:16px; font-weight:bold; color:#4A90E2; }
+        .panel-body { padding:20px; }
+        .form-group { margin-bottom:15px; }
+        .form-label { display:block; margin-bottom:5px; font-weight:500; color:#555; font-size:14px; }
+        .form-input, .form-textarea, .form-select { width:100%; padding:10px 12px; border:1px solid #d9d9d9; border-radius:6px; font-size:14px; transition:border 0.3s; }
+        .form-input:focus, .form-textarea:focus { border-color:#4A90E2; outline:none; box-shadow:0 0 0 2px rgba(74,144,226,0.1); }
+        .form-textarea { min-height:80px; resize:vertical; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+        .form-row-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
+        .card { border:1px solid #eee; border-radius:8px; padding:12px; margin-bottom:10px; transition:box-shadow 0.2s; }
+        .card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+        .card-title { font-weight:bold; font-size:14px; }
+        .card-actions { display:flex; gap:5px; }
+        .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:12px; background:#e6f7ff; color:#4A90E2; }
+        .tag-green { background:#f6ffed; color:#52c41a; }
+        .tag-orange { background:#fff7e6; color:#fa8c16; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:white; border-radius:12px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; }
+        .modal-header { padding:15px 20px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; }
+        .modal-title { font-size:16px; font-weight:bold; }
+        .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+        .modal-body { padding:20px; }
+        .modal-footer { padding:15px 20px; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px; }
+        .translate-btn { background:#722ed1; color:white; border:none; padding:6px 12px; border-radius:4px; font-size:12px; cursor:pointer; margin-top:5px; }
+        .translate-btn:hover { background:#5b21b6; }
+        .lang-tabs { display:flex; gap:5px; margin-bottom:10px; }
+        .lang-tab { padding:5px 12px; border-radius:4px; cursor:pointer; font-size:12px; background:#f0f0f0; }
+        .lang-tab.active { background:#4A90E2; color:white; }
+        .toast { position:fixed; top:20px; right:20px; background:#52c41a; color:white; padding:10px 20px; border-radius:6px; z-index:2000; display:none; }
+        .empty { text-align:center; padding:30px; color:#999; }
+        .tabs { display:flex; border-bottom:2px solid #eee; margin-bottom:20px; }
+        .tab { padding:10px 20px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; color:#666; }
+        .tab.active { color:#4A90E2; border-bottom-color:#4A90E2; font-weight:bold; }
+        #loginPanel { max-width:400px; margin:100px auto; }
+        #adminPanel { display:none; }
+        .img-preview { max-width:100px; max-height:60px; object-fit:cover; border-radius:4px; margin-top:5px; }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+
+    <div id="loginPanel">
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title">商品管理后台 - 登录</span></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="form-label">管理密码</label>
+                    <input type="password" class="form-input" id="loginPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="doLogin()">登录</button>
+                <p style="text-align:center;margin-top:10px;color:#999;font-size:12px">默认密码: admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminPanel">
+        <div class="header">
+            <h1>商品管理后台</h1>
+            <div class="header-btns">
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="exportData()">导出数据</button>
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="importData()">导入数据</button>
+                <button class="btn btn-outline" style="color:white;border-color:white" onclick="doLogout()">退出</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('categories')">分类管理</div>
+                <div class="tab" onclick="switchTab('translate')">翻译管理</div>
+            </div>
+
+            <div id="tabCategories">
+                <div id="categoryList"></div>
+                <button class="btn btn-success" onclick="addCategory()">+ 添加一级分类</button>
+            </div>
+
+            <div id="tabTranslate" style="display:none">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">AI翻译</span>
+                        <button class="btn btn-primary" onclick="translateAll()">一键翻译所有</button>
+                    </div>
+                    <div class="panel-body">
+                        <p style="color:#666;margin-bottom:15px">将中文内容自动翻译为英语、法语、阿拉伯语。使用Google Translate免费API。</p>
+                        <div id="translateStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Edit Modal -->
+    <div class="modal" id="catModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="catModalTitle">编辑分类</span>
+                <button class="modal-close" onclick="closeModal('catModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">分类ID</label>
+                    <input type="text" class="form-input" id="catId" placeholder="英文标识，如 digital">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">中文名称</label>
+                    <input type="text" class="form-input" id="catNameZh" placeholder="分类中文名称">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">English</label>
+                        <input type="text" class="form-input" id="catNameEn">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Français</label>
+                        <input type="text" class="form-input" id="catNameFr">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العربية</label>
+                    <input type="text" class="form-input" id="catNameAr">
+                </div>
+                <button class="translate-btn" onclick="translateFields(['catNameZh'],['catNameEn','catNameFr','catNameAr'])">AI翻译中文到其他语言</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('catModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveCategory()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subcategory Edit Modal -->
+    <div class="modal" id="subModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="subModalTitle">编辑二级分类</span>
+                <button class="modal-close" onclick="closeModal('subModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">分类ID</label>
+                    <input type="text" class="form-input" id="subId" placeholder="英文标识">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">中文名称</label>
+                    <input type="text" class="form-input" id="subNameZh">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">English</label>
+                        <input type="text" class="form-input" id="subNameEn">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Français</label>
+                        <input type="text" class="form-input" id="subNameFr">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العربية</label>
+                    <input type="text" class="form-input" id="subNameAr">
+                </div>
+                <button class="translate-btn" onclick="translateFields(['subNameZh'],['subNameEn','subNameFr','subNameAr'])">AI翻译</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('subModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveSubcategory()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Edit Modal -->
+    <div class="modal" id="prodModal">
+        <div class="modal-content" style="max-width:700px">
+            <div class="modal-header">
+                <span class="modal-title" id="prodModalTitle">编辑商品</span>
+                <button class="modal-close" onclick="closeModal('prodModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">商品ID</label>
+                    <input type="text" class="form-input" id="prodId" placeholder="英文标识">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">中文名称</label>
+                    <input type="text" class="form-input" id="prodNameZh">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">English</label>
+                        <input type="text" class="form-input" id="prodNameEn">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Français</label>
+                        <input type="text" class="form-input" id="prodNameFr">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العربية</label>
+                    <input type="text" class="form-input" id="prodNameAr">
+                </div>
+                <button class="translate-btn" onclick="translateFields(['prodNameZh'],['prodNameEn','prodNameFr','prodNameAr'])">AI翻译名称</button>
+                <div class="form-group" style="margin-top:15px">
+                    <label class="form-label">视频URL</label>
+                    <input type="text" class="form-input" id="prodVideo" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">图片URL（每行一个，最多5张）</label>
+                    <textarea class="form-textarea" id="prodImages" placeholder="https://image1.jpg&#10;https://image2.jpg"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">中文描述</label>
+                    <textarea class="form-textarea" id="prodDescZh" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">English描述</label>
+                        <textarea class="form-textarea" id="prodDescEn" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Français描述</label>
+                        <textarea class="form-textarea" id="prodDescFr" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العربية描述</label>
+                    <textarea class="form-textarea" id="prodDescAr" rows="3"></textarea>
+                </div>
+                <button class="translate-btn" onclick="translateFields(['prodDescZh'],['prodDescEn','prodDescFr','prodDescAr'])">AI翻译描述</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('prodModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveProduct()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" style="display:none" accept=".json" onchange="handleImport(event)">
+
+    <script>
+        let appData = null;
+        let editCatIdx = -1;
+        let editSubIdx = -1;
+        let editProdIdx = -1;
+        let parentCatIdx = -1;
+
+        const DEFAULT_PWD = 'admin123';
+        const DATA_URL = 'https://cookiefries.github.io/productapp/data.json';
+
+        function showToast(msg, color) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = color || '#52c41a';
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        function doLogin() {
+            const pwd = document.getElementById('loginPwd').value;
+            if (pwd === DEFAULT_PWD) {
+                document.getElementById('loginPanel').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadData();
+            } else {
+                showToast('密码错误', '#ff4d4f');
+            }
+        }
+
+        function doLogout() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginPanel').style.display = 'block';
+        }
+
+        async function loadData() {
+            try {
+                const resp = await fetch(DATA_URL + '?t=' + Date.now());
+                appData = await resp.json();
+                renderAll();
+                showToast('数据加载成功');
+            } catch(e) {
+                appData = { settings:{appName:{zh:"商品展示",en:"Product Display",fr:"Exposition",ar:"عرض"},primaryColor:"#4A90E2"}, ui:{}, categories:[] };
+                renderAll();
+                showToast('加载失败，使用空数据', '#ff4d4f');
+            }
+        }
+
+        function renderAll() {
+            renderCategoryList();
+        }
+
+        function renderCategoryList() {
+            const list = document.getElementById('categoryList');
+            if (!appData.categories || appData.categories.length === 0) {
+                list.innerHTML = '<div class="empty">暂无分类，点击下方按钮添加</div>';
+                return;
+            }
+            list.innerHTML = appData.categories.map((cat, ci) => {
+                const subs = cat.subcategories || [];
+                return '<div class="panel"><div class="panel-header">' +
+                    '<span class="panel-title">' + (cat.name.zh || cat.id) + ' <span class="tag">' + cat.id + '</span></span>' +
+                    '<div class="card-actions">' +
+                    '<button class="btn btn-sm btn-outline" onclick="editCategory(' + ci + ')">编辑</button>' +
+                    '<button class="btn btn-sm btn-success" onclick="addSubcategory(' + ci + ')">+子分类</button>' +
+                    '<button class="btn btn-sm btn-danger" onclick="deleteCategory(' + ci + ')">删除</button>' +
+                    '</div></div><div class="panel-body">' +
+                    (subs.length > 0 ? subs.map((sub, si) => {
+                        const prods = sub.products || [];
+                        return '<div class="card"><div class="card-header">' +
+                            '<span class="card-title">' + (sub.name.zh || sub.id) + ' <span class="tag-green tag">' + sub.id + '</span> <span class="tag-orange tag">' + prods.length + '个商品</span></span>' +
+                            '<div class="card-actions">' +
+                            '<button class="btn btn-sm btn-outline" onclick="editSubcategory(' + ci + ',' + si + ')">编辑</button>' +
+                            '<button class="btn btn-sm btn-success" onclick="addProduct(' + ci + ',' + si + ')">+商品</button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteSubcategory(' + ci + ',' + si + ')">删除</button>' +
+                            '</div></div>' +
+                            (prods.length > 0 ? prods.map((p, pi) =>
+                                '<div style="padding:8px 0;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f0f0f0">' +
+                                '<span style="font-size:13px">' + (p.name.zh || p.id) + '</span>' +
+                                '<div class="card-actions">' +
+                                '<button class="btn btn-sm btn-outline" onclick="editProduct(' + ci + ',' + si + ',' + pi + ')">编辑</button>' +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteProduct(' + ci + ',' + si + ',' + pi + ')">删除</button>' +
+                                '</div></div>'
+                            ).join('') : '') +
+                            '</div>';
+                    }).join('') : '<div class="empty">暂无子分类</div>') +
+                    '</div></div>';
+            }).join('');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tabCategories').style.display = tab === 'categories' ? 'block' : 'none';
+            document.getElementById('tabTranslate').style.display = tab === 'translate' ? 'block' : 'none';
+            event.target.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // Category CRUD
+        function addCategory() {
+            editCatIdx = -1;
+            document.getElementById('catModalTitle').textContent = '添加一级分类';
+            document.getElementById('catId').value = '';
+            document.getElementById('catId').disabled = false;
+            document.getElementById('catNameZh').value = '';
+            document.getElementById('catNameEn').value = '';
+            document.getElementById('catNameFr').value = '';
+            document.getElementById('catNameAr').value = '';
+            openModal('catModal');
+        }
+
+        function editCategory(idx) {
+            editCatIdx = idx;
+            const cat = appData.categories[idx];
+            document.getElementById('catModalTitle').textContent = '编辑分类';
+            document.getElementById('catId').value = cat.id;
+            document.getElementById('catId').disabled = true;
+            document.getElementById('catNameZh').value = cat.name.zh || '';
+            document.getElementById('catNameEn').value = cat.name.en || '';
+            document.getElementById('catNameFr').value = cat.name.fr || '';
+            document.getElementById('catNameAr').value = cat.name.ar || '';
+            openModal('catModal');
+        }
+
+        function saveCategory() {
+            const id = document.getElementById('catId').value.trim();
+            const name = {
+                zh: document.getElementById('catNameZh').value.trim(),
+                en: document.getElementById('catNameEn').value.trim(),
+                fr: document.getElementById('catNameFr').value.trim(),
+                ar: document.getElementById('catNameAr').value.trim()
+            };
+            if (!id || !name.zh) { showToast('请填写ID和中文名称', '#ff4d4f'); return; }
+            if (editCatIdx === -1) {
+                appData.categories.push({ id, name, subcategories: [] });
+            } else {
+                appData.categories[editCatIdx].name = name;
+            }
+            closeModal('catModal');
+            renderAll();
+            saveData();
+        }
+
+        function deleteCategory(idx) {
+            if (!confirm('确定删除此分类及所有子分类和商品？')) return;
+            appData.categories.splice(idx, 1);
+            renderAll();
+            saveData();
+        }
+
+        // Subcategory CRUD
+        function addSubcategory(catIdx) {
+            editSubIdx = -1;
+            parentCatIdx = catIdx;
+            document.getElementById('subModalTitle').textContent = '添加二级分类';
+            document.getElementById('subId').value = '';
+            document.getElementById('subId').disabled = false;
+            document.getElementById('subNameZh').value = '';
+            document.getElementById('subNameEn').value = '';
+            document.getElementById('subNameFr').value = '';
+            document.getElementById('subNameAr').value = '';
+            openModal('subModal');
+        }
+
+        function editSubcategory(catIdx, subIdx) {
+            editSubIdx = subIdx;
+            parentCatIdx = catIdx;
+            const sub = appData.categories[catIdx].subcategories[subIdx];
+            document.getElementById('subModalTitle').textContent = '编辑二级分类';
+            document.getElementById('subId').value = sub.id;
+            document.getElementById('subId').disabled = true;
+            document.getElementById('subNameZh').value = sub.name.zh || '';
+            document.getElementById('subNameEn').value = sub.name.en || '';
+            document.getElementById('subNameFr').value = sub.name.fr || '';
+            document.getElementById('subNameAr').value = sub.name.ar || '';
+            openModal('subModal');
+        }
+
+        function saveSubcategory() {
+            const id = document.getElementById('subId').value.trim();
+            const name = {
+                zh: document.getElementById('subNameZh').value.trim(),
+                en: document.getElementById('subNameEn').value.trim(),
+                fr: document.getElementById('subNameFr').value.trim(),
+                ar: document.getElementById('subNameAr').value.trim()
+            };
+            if (!id || !name.zh) { showToast('请填写ID和中文名称', '#ff4d4f'); return; }
+            if (editSubIdx === -1) {
+                appData.categories[parentCatIdx].subcategories.push({ id, name, products: [] });
+            } else {
+                appData.categories[parentCatIdx].subcategories[editSubIdx].name = name;
+            }
+            closeModal('subModal');
+            renderAll();
+            saveData();
+        }
+
+        function deleteSubcategory(catIdx, subIdx) {
+            if (!confirm('确定删除此子分类及所有商品？')) return;
+            appData.categories[catIdx].subcategories.splice(subIdx, 1);
+            renderAll();
+            saveData();
+        }
+
+        // Product CRUD
+        function addProduct(catIdx, subIdx) {
+            editProdIdx = -1;
+            parentCatIdx = catIdx;
+            window.parentSubIdx = subIdx;
+            document.getElementById('prodModalTitle').textContent = '添加商品';
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodId').disabled = false;
+            document.getElementById('prodNameZh').value = '';
+            document.getElementById('prodNameEn').value = '';
+            document.getElementById('prodNameFr').value = '';
+            document.getElementById('prodNameAr').value = '';
+            document.getElementById('prodVideo').value = '';
+            document.getElementById('prodImages').value = '';
+            document.getElementById('prodDescZh').value = '';
+            document.getElementById('prodDescEn').value = '';
+            document.getElementById('prodDescFr').value = '';
+            document.getElementById('prodDescAr').value = '';
+            openModal('prodModal');
+        }
+
+        function editProduct(catIdx, subIdx, prodIdx) {
+            editProdIdx = prodIdx;
+            parentCatIdx = catIdx;
+            window.parentSubIdx = subIdx;
+            const p = appData.categories[catIdx].subcategories[subIdx].products[prodIdx];
+            document.getElementById('prodModalTitle').textContent = '编辑商品';
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodId').disabled = true;
+            document.getElementById('prodNameZh').value = p.name.zh || '';
+            document.getElementById('prodNameEn').value = p.name.en || '';
+            document.getElementById('prodNameFr').value = p.name.fr || '';
+            document.getElementById('prodNameAr').value = p.name.ar || '';
+            document.getElementById('prodVideo').value = p.video || '';
+            document.getElementById('prodImages').value = (p.images || []).join('\n');
+            document.getElementById('prodDescZh').value = (p.description && p.description.zh) || '';
+            document.getElementById('prodDescEn').value = (p.description && p.description.en) || '';
+            document.getElementById('prodDescFr').value = (p.description && p.description.fr) || '';
+            document.getElementById('prodDescAr').value = (p.description && p.description.ar) || '';
+            openModal('prodModal');
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('prodId').value.trim();
+            const name = {
+                zh: document.getElementById('prodNameZh').value.trim(),
+                en: document.getElementById('prodNameEn').value.trim(),
+                fr: document.getElementById('prodNameFr').value.trim(),
+                ar: document.getElementById('prodNameAr').value.trim()
+            };
+            const video = document.getElementById('prodVideo').value.trim();
+            const images = document.getElementById('prodImages').value.trim().split('\n').filter(u => u.trim());
+            const description = {
+                zh: document.getElementById('prodDescZh').value.trim(),
+                en: document.getElementById('prodDescEn').value.trim(),
+                fr: document.getElementById('prodDescFr').value.trim(),
+                ar: document.getElementById('prodDescAr').value.trim()
+            };
+            if (!id || !name.zh) { showToast('请填写ID和中文名称', '#ff4d4f'); return; }
+            const product = { id, name, video, images: images.slice(0, 5), description };
+            const sub = appData.categories[parentCatIdx].subcategories[window.parentSubIdx];
+            if (editProdIdx === -1) {
+                sub.products.push(product);
+            } else {
+                sub.products[editProdIdx] = product;
+            }
+            closeModal('prodModal');
+            renderAll();
+            saveData();
+        }
+
+        function deleteProduct(catIdx, subIdx, prodIdx) {
+            if (!confirm('确定删除此商品？')) return;
+            appData.categories[catIdx].subcategories[subIdx].products.splice(prodIdx, 1);
+            renderAll();
+            saveData();
+        }
+
+        // AI Translation
+        async function translateText(text, targetLang) {
+            const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh&tl=' + targetLang + '&dt=t&q=' + encodeURIComponent(text);
+            const resp = await fetch(url);
+            const data = await resp.json();
+            return data[0].map(s => s[0]).join('');
+        }
+
+        async function translateFields(srcIds, targetIds) {
+            const srcText = document.getElementById(srcIds[0]).value.trim();
+            if (!srcText) { showToast('请先填写中文内容', '#ff4d4f'); return; }
+            const langMap = { En: 'en', Fr: 'fr', Ar: 'ar' };
+            for (const tid of targetIds) {
+                const lang = tid.slice(-2).toLowerCase();
+                try {
+                    const translated = await translateText(srcText, lang);
+                    document.getElementById(tid).value = translated;
+                } catch(e) {
+                    showToast(tid + ' 翻译失败', '#ff4d4f');
+                }
+            }
+            showToast('翻译完成');
+        }
+
+        async function translateAll() {
+            const status = document.getElementById('translateStatus');
+            status.innerHTML = '<p>正在翻译...</p>';
+            let count = 0;
+            for (const cat of appData.categories) {
+                if (cat.name.zh && !cat.name.en) {
+                    try {
+                        cat.name.en = await translateText(cat.name.zh, 'en');
+                        cat.name.fr = await translateText(cat.name.zh, 'fr');
+                        cat.name.ar = await translateText(cat.name.zh, 'ar');
+                        count++;
+                    } catch(e) {}
+                }
+                for (const sub of (cat.subcategories || [])) {
+                    if (sub.name.zh && !sub.name.en) {
+                        try {
+                            sub.name.en = await translateText(sub.name.zh, 'en');
+                            sub.name.fr = await translateText(sub.name.zh, 'fr');
+                            sub.name.ar = await translateText(sub.name.zh, 'ar');
+                            count++;
+                        } catch(e) {}
+                    }
+                    for (const p of (sub.products || [])) {
+                        if (p.name.zh && !p.name.en) {
+                            try {
+                                p.name.en = await translateText(p.name.zh, 'en');
+                                p.name.fr = await translateText(p.name.zh, 'fr');
+                                p.name.ar = await translateText(p.name.zh, 'ar');
+                                count++;
+                            } catch(e) {}
+                        }
+                        if (p.description && p.description.zh && !p.description.en) {
+                            try {
+                                p.description.en = await translateText(p.description.zh, 'en');
+                                p.description.fr = await translateText(p.description.zh, 'fr');
+                                p.description.ar = await translateText(p.description.zh, 'ar');
+                                count++;
+                            } catch(e) {}
+                        }
+                    }
+                }
+            }
+            status.innerHTML = '<p style="color:#52c41a">翻译完成！共翻译 ' + count + ' 项</p>';
+            saveData();
+            renderAll();
+        }
+
+        // Save & Export
+        function saveData() {
+            try {
+                localStorage.setItem('productapp_data', JSON.stringify(appData));
+                showToast('数据已保存到本地');
+            } catch(e) { showToast('保存失败', '#ff4d4f'); }
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'data.json';
+            a.click();
+            showToast('数据已导出');
+        }
+
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    renderAll();
+                    saveData();
+                    showToast('数据导入成功');
+                } catch(err) {
+                    showToast('文件格式错误', '#ff4d4f');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
