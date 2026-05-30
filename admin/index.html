@@ -21,6 +21,8 @@
         .btn-purple:hover { background:#5b21b6; }
         .btn-outline { background:white; color:#4A90E2; border:1px solid #4A90E2; }
         .btn-outline:hover { background:#f0f7ff; }
+        .btn-header { background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.5); }
+        .btn-header:hover { background:rgba(255,255,255,0.3); }
         .btn-sm { padding:5px 10px; font-size:12px; }
         .container { max-width:1200px; margin:20px auto; padding:0 20px; }
         .panel { background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:20px; overflow:hidden; }
@@ -92,10 +94,10 @@
                 <span id="githubStatus" class="github-status status-warn">未配置GitHub</span>
                 <span id="saveIndicator" class="save-indicator"><span class="spin">⟳</span> 保存中...</span>
                 <button class="btn btn-success" onclick="saveToGitHub()" id="btnSaveGitHub">保存到GitHub</button>
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="exportData()">导出JSON</button>
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="importData()">导入JSON</button>
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="openSettings()">设置</button>
-                <button class="btn btn-outline" style="color:white;border-color:white" onclick="doLogout()">退出</button>
+                <button class="btn btn-header" onclick="exportData()">导出JSON</button>
+                <button class="btn btn-header" onclick="importData()">导入JSON</button>
+                <button class="btn btn-header" onclick="openSettings()">设置</button>
+                <button class="btn btn-header" onclick="doLogout()">退出</button>
             </div>
         </div>
 
@@ -148,6 +150,12 @@
                 </div>
                 <button class="btn btn-primary" onclick="testGitHubConnection()">测试连接</button>
                 <div id="testResult" style="margin-top:10px;font-size:13px"></div>
+                <hr style="margin:20px 0;border:none;border-top:1px solid #eee">
+                <div class="form-group">
+                    <label class="form-label">修改管理密码</label>
+                    <input type="password" class="form-input" id="newPassword" placeholder="留空则不修改密码">
+                    <p style="font-size:12px;color:#999;margin-top:5px">修改后请牢记新密码</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('settingsModal')">取消</button>
@@ -342,7 +350,10 @@
 
         function doLogin() {
             const pwd = document.getElementById('loginPwd').value;
-            if (pwd === DEFAULT_PWD) {
+            const storedPwd = localStorage.getItem('admin_password');
+            const validPwd = storedPwd || DEFAULT_PWD;
+            
+            if (pwd === validPwd) {
                 document.getElementById('loginPanel').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 updateGitHubStatus();
@@ -427,6 +438,7 @@
             document.getElementById('githubToken').value = githubConfig.token;
             document.getElementById('repoUrl').value = githubConfig.repo;
             document.getElementById('dataPath').value = githubConfig.dataPath;
+            document.getElementById('newPassword').value = '';
             openModal('settingsModal');
         }
 
@@ -437,9 +449,17 @@
             localStorage.setItem('gh_token', githubConfig.token);
             localStorage.setItem('gh_repo', githubConfig.repo);
             localStorage.setItem('gh_data_path', githubConfig.dataPath);
+            
+            // Handle password change
+            const newPwd = document.getElementById('newPassword').value.trim();
+            if (newPwd) {
+                localStorage.setItem('admin_password', newPwd);
+                showToast('密码已修改，请牢记新密码');
+            }
+            
             updateGitHubStatus();
             closeModal('settingsModal');
-            showToast('设置已保存');
+            if (!newPwd) showToast('设置已保存');
         }
 
         async function testGitHubConnection() {
