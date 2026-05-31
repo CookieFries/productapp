@@ -559,7 +559,7 @@
             let html = '';
 
             if (product.video) {
-                html += '<div class="detail-video-wrap"><video class="detail-video" controls preload="metadata" src="' + product.video + '"></video></div>';
+                html += '<div class="detail-video-wrap"><video class="detail-video" controls preload="none" src="' + product.video + '"></video></div>';
             }
 
             if (product.images && product.images.length > 0) {
