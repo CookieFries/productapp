@@ -65,20 +65,33 @@
   "categories": [
     {
       "id": "3c_digital",
-      "name": { "zh": "3C数码", "en": "3C Digital", "fr": "3C Numérique", "ar": "3C رقمي" },
+      "name": {
+        "zh": "3C数码",
+        "en": "3C Digital",
+        "fr": "3C Numérique",
+        "ar": "3C رقمي"
+      },
       "subcategories": [
         {
           "id": "phone_parts",
-          "name": { "zh": "手机零配件", "en": "Phone Parts", "fr": "Pièces de téléphone", "ar": "قطع غيار الهاتف" },
+          "name": {
+            "zh": "手机零配件",
+            "en": "Phone Parts",
+            "fr": "Pièces de téléphone",
+            "ar": "قطع غيار الهاتف"
+          },
           "products": [
             {
               "id": "demo_phone_case",
-              "name": { "zh": "示例手机壳", "en": "Sample Phone Case", "fr": "Coque téléphone", "ar": "حافظة هاتف" },
-              "video": "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+              "name": {
+                "zh": "示例手机壳",
+                "en": "Sample Phone Case",
+                "fr": "Coque téléphone",
+                "ar": "حافظة هاتف"
+              },
+              "video": "https://res.cloudinary.com/dpj5addfo/image/upload/v1780131585/351d3255150fc622a3b59b1d7e422a26_t2kd1p.jpg",
               "images": [
-                "https://via.placeholder.com/400x300/4A90E2/ffffff?text=Phone+Case+1",
-                "https://via.placeholder.com/400x300/5BA0F2/ffffff?text=Phone+Case+2",
-                "https://via.placeholder.com/400x300/6BB0FF/ffffff?text=Phone+Case+3"
+                "https://res.cloudinary.com/dpj5addfo/image/upload/v1780131585/351d3255150fc622a3b59b1d7e422a26_t2kd1p.jpg"
               ],
               "description": {
                 "zh": "高品质TPU手机壳，防摔抗震，完美贴合，多色可选。",
@@ -91,11 +104,21 @@
         },
         {
           "id": "power_bank",
-          "name": { "zh": "移动电源", "en": "Power Bank", "fr": "Batterie externe", "ar": "بنك الطاقة" },
+          "name": {
+            "zh": "移动电源",
+            "en": "Power Bank",
+            "fr": "Batterie externe",
+            "ar": "بنك الطاقة"
+          },
           "products": [
             {
               "id": "demo_power_bank",
-              "name": { "zh": "示例充电宝", "en": "Sample Power Bank", "fr": "Batterie portable", "ar": "شاحن محمول" },
+              "name": {
+                "zh": "示例充电宝",
+                "en": "Sample Power Bank",
+                "fr": "Batterie portable",
+                "ar": "شاحن محمول"
+              },
               "video": "",
               "images": [
                 "https://via.placeholder.com/400x300/FF6B6B/ffffff?text=Power+Bank+1",
@@ -112,75 +135,145 @@
         },
         {
           "id": "smart_wearable",
-          "name": { "zh": "智能穿戴", "en": "Smart Wearable", "fr": "Objet connecté", "ar": "أجهزة قابلة للارتداء" },
+          "name": {
+            "zh": "智能穿戴",
+            "en": "Smart Wearable",
+            "fr": "Objet connecté",
+            "ar": "أجهزة قابلة للارتداء"
+          },
           "products": []
         },
         {
           "id": "bluetooth_speaker",
-          "name": { "zh": "蓝牙音响", "en": "Bluetooth Speaker", "fr": "Haut-parleur Bluetooth", "ar": "مكبر صوت بلوتوث" },
+          "name": {
+            "zh": "蓝牙音响",
+            "en": "Bluetooth Speaker",
+            "fr": "Haut-parleur Bluetooth",
+            "ar": "مكبر صوت بلوتوث"
+          },
           "products": []
         }
       ]
     },
     {
       "id": "lighting",
-      "name": { "zh": "灯饰", "en": "Lighting", "fr": "Éclairage", "ar": "إضاءة" },
+      "name": {
+        "zh": "灯饰",
+        "en": "Lighting",
+        "fr": "Éclairage",
+        "ar": "إضاءة"
+      },
       "subcategories": [
         {
           "id": "ceiling_light",
-          "name": { "zh": "吸顶灯", "en": "Ceiling Light", "fr": "Plafonnier", "ar": "سقفية" },
+          "name": {
+            "zh": "吸顶灯",
+            "en": "Ceiling Light",
+            "fr": "Plafonnier",
+            "ar": "سقفية"
+          },
           "products": []
         },
         {
           "id": "desk_lamp",
-          "name": { "zh": "台灯", "en": "Desk Lamp", "fr": "Lampe de bureau", "ar": "مصباح مكتبي" },
+          "name": {
+            "zh": "台灯",
+            "en": "Desk Lamp",
+            "fr": "Lampe de bureau",
+            "ar": "مصباح مكتبي"
+          },
           "products": []
         },
         {
           "id": "strip_light",
-          "name": { "zh": "灯带", "en": "LED Strip", "fr": "Bande LED", "ar": "شريط LED" },
+          "name": {
+            "zh": "灯带",
+            "en": "LED Strip",
+            "fr": "Bande LED",
+            "ar": "شريط LED"
+          },
           "products": []
         }
       ]
     },
     {
       "id": "small_appliance",
-      "name": { "zh": "小家电", "en": "Small Appliance", "fr": "Petit électroménager", "ar": "أجهزة منزلية صغيرة" },
+      "name": {
+        "zh": "小家电",
+        "en": "Small Appliance",
+        "fr": "Petit électroménager",
+        "ar": "أجهزة منزلية صغيرة"
+      },
       "subcategories": [
         {
           "id": "kitchen_appliance",
-          "name": { "zh": "厨房电器", "en": "Kitchen Appliance", "fr": "Appareil de cuisine", "ar": "أجهزة المطبخ" },
+          "name": {
+            "zh": "厨房电器",
+            "en": "Kitchen Appliance",
+            "fr": "Appareil de cuisine",
+            "ar": "أجهزة المطبخ"
+          },
           "products": []
         },
         {
           "id": "cleaning_appliance",
-          "name": { "zh": "清洁电器", "en": "Cleaning Appliance", "fr": "Appareil de nettoyage", "ar": "أجهزة التنظيف" },
+          "name": {
+            "zh": "清洁电器",
+            "en": "Cleaning Appliance",
+            "fr": "Appareil de nettoyage",
+            "ar": "أجهزة التنظيف"
+          },
           "products": []
         },
         {
           "id": "personal_care",
-          "name": { "zh": "个人护理", "en": "Personal Care", "fr": "Soins personnels", "ar": "العناية الشخصية" },
+          "name": {
+            "zh": "个人护理",
+            "en": "Personal Care",
+            "fr": "Soins personnels",
+            "ar": "العناية الشخصية"
+          },
           "products": []
         }
       ]
     },
     {
       "id": "beauty_daily",
-      "name": { "zh": "美妆日护", "en": "Beauty & Care", "fr": "Beauté & Soins", "ar": "الجمال والعناية" },
+      "name": {
+        "zh": "美妆日护",
+        "en": "Beauty & Care",
+        "fr": "Beauté & Soins",
+        "ar": "الجمال والعناية"
+      },
       "subcategories": [
         {
           "id": "skincare",
-          "name": { "zh": "护肤品", "en": "Skincare", "fr": "Soins de la peau", "ar": "العناية بالبشرة" },
+          "name": {
+            "zh": "护肤品",
+            "en": "Skincare",
+            "fr": "Soins de la peau",
+            "ar": "العناية بالبشرة"
+          },
           "products": []
         },
         {
           "id": "makeup",
-          "name": { "zh": "彩妆", "en": "Makeup", "fr": "Maquillage", "ar": "مكياج" },
+          "name": {
+            "zh": "彩妆",
+            "en": "Makeup",
+            "fr": "Maquillage",
+            "ar": "مكياج"
+          },
           "products": []
         },
         {
           "id": "daily_care",
-          "name": { "zh": "日用品", "en": "Daily Care", "fr": "Soins quotidiens", "ar": "العناية اليومية" },
+          "name": {
+            "zh": "日用品",
+            "en": "Daily Care",
+            "fr": "Soins quotidiens",
+            "ar": "العناية اليومية"
+          },
           "products": []
         }
       ]
